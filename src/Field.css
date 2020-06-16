@@ -1,0 +1,31 @@
+#field {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: 85vw;
+    max-height: 7vw;
+    border: 1px solid white;
+  }
+
+  .square {
+    flex: 1 0 auto;
+  }
+
+  .white {
+      background-color: white;
+  }
+
+  .black {
+      background-color: black;
+  }
+
+  img {
+    position: absolute;
+    height:100%;
+  }

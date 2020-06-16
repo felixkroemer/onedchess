@@ -1,12 +1,12 @@
 import React from 'react';
+import Field from './Field';
 import './App.css';
 
 function App() {
   return (
     <div id="App">
     <div id="upper">
-      <div id="field">
-      </div>
+      <Field></Field>
     </div>
     <div id="lower">
     </div>
