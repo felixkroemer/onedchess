@@ -1,0 +1,41 @@
+#App {
+  height: 100%;
+  margin: 0;
+  display: block;
+  background: black;
+}
+
+#field {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  border: 1px solid blue;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 85vw;
+  max-height: 7vw;
+}
+
+#lower {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#upper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80%;
+}
