@@ -12,20 +12,3 @@
     max-height: 7vw;
     border: 1px solid white;
   }
-
-  .square {
-    flex: 1 0 auto;
-  }
-
-  .white {
-      background-color: white;
-  }
-
-  .black {
-      background-color: black;
-  }
-
-  img {
-    position: absolute;
-    height:100%;
-  }

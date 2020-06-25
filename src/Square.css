@@ -1,0 +1,11 @@
+  .square {
+      flex: 1 0 auto;
+  }
+
+  .white {
+      background-color: white;
+  }
+
+  .black {
+      background-color: black;
+  }
