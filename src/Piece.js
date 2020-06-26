@@ -1,7 +1,7 @@
 import React from 'react';
 import './Piece.css';
-import wqueen from './pieces/wqueen.svg';
-import bqueen from './pieces/bqueen.svg';
+import wking from './pieces/wking.svg';
+import bking from './pieces/bking.svg';
 import wrook from './pieces/wrook.svg';
 import brook from './pieces/brook.svg';
 import wknight from './pieces/wknight.svg';
@@ -25,8 +25,8 @@ const Piece = (props) => {
         case ItemTypes.KNIGHT:
             piece = props.type[0] ? bknight : wknight;
             break;
-        case ItemTypes.QUEEN:
-            piece = props.type[0] ? bqueen : wqueen;
+        case ItemTypes.KING:
+            piece = props.type[0] ? bking : wking;
             break;
         default:
     }
