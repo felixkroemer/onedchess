@@ -10,31 +10,26 @@ import { ItemTypes } from './ItemTypes';
 import { useDrag } from 'react-dnd'
 
 const Piece = (props) => {
-
-    const [{ isDragging }, drag, preview] = useDrag({
-        item: { type: ItemTypes.KNIGHT },
+    const [{ isDragging }, drag] = useDrag({
+        item: { type: props.type[1], id: props.id },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         }),
     })
 
-    if (props.type == null) {
-        return null;
-    } else {
-        var piece = null;
-        console.log(props.type[1]);
-        switch (props.type[1]) {
-            case ItemTypes.ROOK:
-                piece = props.type[0] ? brook : wrook;
-                break;
-            case ItemTypes.KNIGHT:
-                piece = props.type[0] ? bknight : wknight;
-                break;
-            case ItemTypes.QUEEN:
-                piece = props.type[0] ? bqueen : wqueen;
-                break;
-        }
-        return (<img src={piece}></img>);
+    var piece = null;
+    switch (props.type[1]) {
+        case ItemTypes.ROOK:
+            piece = props.type[0] ? brook : wrook;
+            break;
+        case ItemTypes.KNIGHT:
+            piece = props.type[0] ? bknight : wknight;
+            break;
+        case ItemTypes.QUEEN:
+            piece = props.type[0] ? bqueen : wqueen;
+            break;
+        default:
     }
+    return (<img ref={drag} src={piece} alt=""></img>);
 }
 export default Piece;

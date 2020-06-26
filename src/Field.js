@@ -1,6 +1,7 @@
 import React from 'react';
 import './Field.css';
 import Square from './Square';
+import Piece from './Piece';
 import { ItemTypes } from './ItemTypes';
 
 export default class Field extends React.Component {
@@ -22,12 +23,32 @@ export default class Field extends React.Component {
     this.state = {
       field: f
     };
+    this.onDrop = this.onDrop.bind(this);
+  }
+
+  onDrop(source, target) {
+    const newField = [...this.state.field];
+    newField[target] = this.state.field[source];
+    newField[source] = null;
+    this.setState({ field: newField });
+  }
+
+  canDrop(source, target) {
+    return true;
   }
 
   render() {
     var squares = [];
     for (var i = 0; i < 12; i++) {
-      squares.push(< Square id={i} type={this.state.field[i]} />);
+      var piece = null;
+      if (this.state.field[i] != null) {
+        piece = <Piece id={i} type={this.state.field[i]} />;
+      }
+      squares.push(
+        < Square id={i} onDrop={this.onDrop} canDrop={this.canDrop}>
+          {piece}
+        </ Square>
+      );
     }
     return (< div id="field" > {squares} </div>);
   }
