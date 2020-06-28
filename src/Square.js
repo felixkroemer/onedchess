@@ -10,15 +10,16 @@ export default function Square(props) {
         canDrop: monitor => props.canDrop(monitor.id, props.id),
         drop: monitor => props.onDrop(monitor.id, props.id),
         collect: (monitor) => ({
-            isOver: !!monitor.isOver(),
             canDrop: !!monitor.canDrop(),
         }),
     })
 
     var className = "square";
     className += props.id % 2 === 1 ? " black" : " white";
+    var overlay = canDrop ? <div className='overlay' /> : null;
     return (
         <div className={className} ref={drop}>
+            {overlay}
             {props.children}
         </div>
     )

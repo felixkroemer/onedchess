@@ -46,10 +46,8 @@ export default class Field extends React.Component {
     } else {
       newField[source] = null;
     }
-    if (this.checkCheck(this.state.field.slice(), source, target, !this.state.whitesTurn)) {
-      //TODO
-    }
     this.setState({ field: newField, whitesTurn: !this.state.whitesTurn });
+    this.props.setInfoText(this.state.whitesTurn ? "White's Turn" : "Black's turn");
   }
 
   canDrop(source, target) {

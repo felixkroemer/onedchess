@@ -1,5 +1,6 @@
   .square {
       flex: 1 0 auto;
+      position: relative;
   }
 
   .white {
@@ -8,4 +9,13 @@
 
   .black {
       background-color: black;
+  }
+
+  .overlay {
+      background-color: green;
+      opacity: 0.3;
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      z-index: 1;
   }
