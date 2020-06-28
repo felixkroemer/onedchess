@@ -22,7 +22,9 @@ export default class Field extends React.Component {
     f[11] = [true, ItemTypes.ROOK];
     this.state = {
       field: f,
-      whitesTurn: true
+      whitesTurn: true,
+      whiteSwapped: false,
+      blackSwapped: false
     };
     this.onDrop = this.onDrop.bind(this);
     this.canDrop = this.canDrop.bind(this);
@@ -31,7 +33,19 @@ export default class Field extends React.Component {
   onDrop(source, target) {
     const newField = [...this.state.field];
     newField[target] = this.state.field[source];
-    newField[source] = null;
+    var s = this.state.field[source][1];
+    var t = this.state.field[target] ? this.state.field[target][1] : null;
+    if (((s === ItemTypes.KING && t === ItemTypes.ROOK) || (t === ItemTypes.KING && s === ItemTypes.ROOK)) &&
+      this.state.field[source][0] === this.state.field[target][0]) {
+      if (this.state.whitesTurn) {
+        this.setState({ whiteSwapped: true });
+      } else {
+        this.setState({ blackSwapped: true });
+      }
+      newField[source] = this.state.field[target];
+    } else {
+      newField[source] = null;
+    }
     if (this.checkCheck(this.state.field.slice(), source, target, !this.state.whitesTurn)) {
       //TODO
     }
@@ -40,19 +54,45 @@ export default class Field extends React.Component {
 
   canDrop(source, target) {
     var field = this.state.field;
-    if (this.state.whitesTurn === field[source][0]) {
+    if (this.state.whitesTurn === field[source][0] || source === target) {
       return false;
-    } else if (source === target || (field[target] && field[source][0] === field[target][0])) {
-      return false;
-    } else if (field[target] != null && field[target][1] == ItemTypes.KING) {
+    } else if (field[target] != null && field[target][1] === ItemTypes.KING) {
       return false;
     } else {
+
+      if (this.checkCheck(field.slice(), source, target, this.state.whitesTurn)) {
+        return false;
+      }
+
+      if (field[target] && field[source][0] === field[target][0]) {
+        var whitesTurn = this.state.whitesTurn;
+        if ((whitesTurn && this.state.whiteSwapped) || (!whitesTurn && this.state.blackSwapped)) {
+          return false;
+        } else {
+          var outerRook = null;
+          for (var i = whitesTurn ? 0 : 11; whitesTurn ? i < 12 : i > 0; whitesTurn ? i++ : i--) {
+            if (field[i] && field[i][1] === ItemTypes.ROOK) {
+              outerRook = i;
+              break;
+            }
+          }
+          var l = source === outerRook;
+          if (l || target === outerRook) {
+            if (field[l ? target : source][1] === ItemTypes.KING) {
+
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
       var lower = source <= target ? source : target;
       var upper = lower === source ? target : source;
       switch (field[source][1]) {
         case ItemTypes.ROOK:
-          for (var i = lower + 1; i < upper; i++) {
-            if (field[i]) {
+          for (var j = lower + 1; j < upper; j++) {
+            if (field[j]) {
               return false;
             }
           }
@@ -63,16 +103,12 @@ export default class Field extends React.Component {
           }
           break;
         case ItemTypes.KNIGHT:
-          if ((upper - lower) != 2) {
+          if ((upper - lower) !== 2) {
             return false;
           }
           break;
+        default:
       }
-
-      if (this.checkCheck(field.slice(), source, target, this.state.whitesTurn)) {
-        return false;
-      }
-
       return true;
     }
   }
@@ -81,12 +117,20 @@ export default class Field extends React.Component {
    * check if color is in check after move is carried out
    */
   checkCheck(field, source, target, color) {
+    var s = field[source];
+    var t = field[target] ? field[target] : null;
     field[target] = field[source];
-    field[source] = null;
+    if (t && s[0] === t[0] &&
+      ((s[1] === ItemTypes.KING && t[1] === ItemTypes.ROOK) ||
+        (t[1] === ItemTypes.KING && s[1] === ItemTypes.ROOK))) {
+      field[source] = t;
+    } else {
+      field[source] = null;
+    }
     var king = null;
-    for (var i = 0; i < 12; i++) {
-      if (field[i] && field[i][0] === !color && field[i][1] === ItemTypes.KING) {
-        king = i;
+    for (var k = 0; k < 12; k++) {
+      if (field[k] && field[k][0] === !color && field[k][1] === ItemTypes.KING) {
+        king = k;
       }
     }
     for (var i = 0; i < 12; i++) {
@@ -98,17 +142,22 @@ export default class Field extends React.Component {
         switch (field[i][1]) {
           case ItemTypes.ROOK:
             for (var j = 0; j <= Math.abs(i - king); king >= i ? j++ : j--) {
-              if (i + j == king) {
+              if (i + j === king) {
                 return true;
               } else {
-                if (field[i + j] && j != 0) {
+                if (field[i + j] && j !== 0) {
                   break;
                 }
               }
             }
             break;
           case ItemTypes.KNIGHT:
-            if (i + 2 == king || i - 2 == king) {
+            if (i + 2 === king || i - 2 === king) {
+              return true;
+            }
+            break;
+          case ItemTypes.KING:
+            if (i + 1 === king || i - 1 === king) {
               return true;
             }
             break;
