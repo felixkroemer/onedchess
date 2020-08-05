@@ -3,6 +3,7 @@ import './Field.css';
 import Square from './Square';
 import Piece from './Piece';
 import { ItemTypes } from './ItemTypes';
+import openSocket from 'socket.io-client';
 
 export default class Field extends React.Component {
   constructor(props) {
@@ -20,14 +21,23 @@ export default class Field extends React.Component {
     f[9] = [true, ItemTypes.KING];
     f[10] = [true, ItemTypes.KNIGHT];
     f[11] = [true, ItemTypes.ROOK];
+
+    var socket = openSocket(process.env.REACT_APP_API_URL);
+    socket.on('startGame', data => this.startGame(data));
+
     this.state = {
       field: f,
       whitesTurn: true,
       whiteSwapped: false,
-      blackSwapped: false
+      blackSwapped: false,
     };
+
     this.onDrop = this.onDrop.bind(this);
     this.canDrop = this.canDrop.bind(this);
+  }
+
+  startGame(data) {
+    console.log(data)
   }
 
   onDrop(source, target) {
@@ -217,4 +227,6 @@ export default class Field extends React.Component {
     }
     return (< div id="field" > {squares} </div>);
   }
+
+
 }
