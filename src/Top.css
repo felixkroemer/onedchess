@@ -1,0 +1,44 @@
+#top {
+    top: 5%;
+    left: 0;
+    right: 7%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    font-family: monospace, serif;
+    position: absolute;
+    z-index: 1;
+    white-space: pre-wrap;
+}
+
+#inp {
+    position:relative;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom: 0;
+    width: 100%;
+    background-color: black;
+    color: white;
+    font-family: monospace, serif;
+    text-align: center;
+    font-size: 16px;
+    border: 1px solid white;
+    text-transform: uppercase;
+}
+
+#id {
+    text-align: center;
+    width: 6%;
+    min-width: 60px;
+    font-family: monospace, serif;
+    border: 1px solid white;
+}
+
+
+#form {
+    width: 6%;
+    min-width: 60px;
+    border: none;
+}
