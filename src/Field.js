@@ -30,6 +30,9 @@ export default class Field extends React.Component {
       whitesTurn: true,
       whiteSwapped: false,
       blackSwapped: false,
+      playersMove: true,
+      offline: true,
+      firstMove: true
     };
 
     this.onDrop = this.onDrop.bind(this);
@@ -40,7 +43,15 @@ export default class Field extends React.Component {
     console.log(data)
   }
 
-  onDrop(source, target) {
+  async onDrop(source, target) {
+
+    if (this.state.firstMove) {
+      if (this.state.field[source][0]) {
+        this.setState({ whitesTurn: false })
+      }
+      this.setState({ firstMove: false })
+    }
+
     const newField = [...this.state.field];
     newField[target] = this.state.field[source];
     var s = this.state.field[source][1];
@@ -66,27 +77,47 @@ export default class Field extends React.Component {
     } else {
       this.props.setInfoText(!this.state.whitesTurn ? "White's turn" : "Black's turn");
     }
-    this.setState({ field: newField, whitesTurn: !this.state.whitesTurn });
+
+    this.setState({ field: newField, whitesTurn: !this.state.whitesTurn, playersMove: !this.state.playersMove });
+
+    if (this.state.offline && !this.state.playersMove) {
+      var moves = this.getMoves(this.state.field, this.state.whitesTurn)
+      if (moves.length === 0) {
+        return
+      }
+      var move = moves[Math.floor(Math.random() * moves.length)]
+      await this.sleep(500)
+      this.onDrop(move[0], move[1])
+      return
+    }
+  }
+
+  getMoves(field, whitesTurn) {
+    var moves = []
+    for (var i = 0; i < 12; i++) {
+      if (field[i] && field[i][0] === whitesTurn) {
+        continue
+      } else {
+        for (var j = 0; j < 12; j++) {
+          if (this.canDrop(i, j, whitesTurn, field)) {
+            moves.push([i, j])
+          }
+        }
+      }
+    }
+    return moves
+  }
+
+  async sleep(msec) {
+    return new Promise(resolve => setTimeout(resolve, msec));
   }
 
   testCheckMate(newField) {
     var checkMate = true;
-    for (var i = 0; i < 12; i++) {
-      if (newField[i] && newField[i][0] !== this.state.whitesTurn) {
-        continue;
-      } else {
-        // find possible moves for other player
-        for (var j = 0; j < 12; j++) {
-          if (this.canDrop(i, j, !this.state.whitesTurn, newField)) {
-            // check if possible move by other player cancels check
-            if (!this.checkCheck(newField, i, j, !this.state.whitesTurn)) {
-              checkMate = false;
-              break;
-            }
-          }
-        }
-      }
-      if (!checkMate) {
+    var moves = this.getMoves(newField, !this.state.whitesTurn)
+    for (var i = 0; i < moves.length; i++) {
+      if (!this.checkCheck(newField, moves[i][0], moves[i][1], !this.state.whitesTurn)) {
+        checkMate = false;
         break;
       }
     }
@@ -97,7 +128,7 @@ export default class Field extends React.Component {
     if (!field[source]) {
       return false;
     }
-    if (color === field[source][0] || source === target) {
+    if ((color === field[source][0] && !this.state.firstMove) || source === target) {
       return false;
     } else if (field[target] != null && field[target][1] === ItemTypes.KING) {
       return false;
@@ -106,7 +137,6 @@ export default class Field extends React.Component {
       if (this.checkCheck(field, source, target, color)) {
         return false;
       }
-
       if (field[target] && field[source][0] === field[target][0]) {
         if ((color && this.state.whiteSwapped) || (!color && this.state.blackSwapped)) {
           return false;
@@ -121,7 +151,6 @@ export default class Field extends React.Component {
           var l = source === outerRook;
           if (l || target === outerRook) {
             if (field[l ? target : source][1] === ItemTypes.KING) {
-
               return true;
             }
           }

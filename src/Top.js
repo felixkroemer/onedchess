@@ -61,7 +61,7 @@ export default class Field extends React.Component {
         return (
             <div id="top">
                 {'Your ID: '}
-                <div id="id">{this.state.id ? this.state.id : ""}</div>
+                <div id="id">{this.state.id ? this.state.id : "     "}</div>
                 {'  '}
                 {'Partner ID: '}
                 <form id="form" onSubmit={this.handleSubmit.bind(this)}>
