@@ -1,5 +1,6 @@
 import React from 'react';
 import './Top.css';
+import openSocket from 'socket.io-client';
 
 export default class Field extends React.Component {
 
@@ -20,6 +21,9 @@ export default class Field extends React.Component {
                 if (xhr.status === 200) {
                     var json_obj = JSON.parse(xhr.responseText);
                     this.setState({ id: json_obj["id"] });
+                    var socket = openSocket(process.env.REACT_APP_API_URL);
+                    this.props.setSocket(socket)
+                    socket.emit("registerSID")
                 } else {
                     console.error(xhr.statusText);
                 }

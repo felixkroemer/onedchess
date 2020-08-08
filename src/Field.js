@@ -2,12 +2,37 @@ import React from 'react';
 import './Field.css';
 import Square from './Square';
 import Piece from './Piece';
+import Top from './Top';
 import { ItemTypes } from './ItemTypes';
-import openSocket from 'socket.io-client';
 
 export default class Field extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      field: this.getStartField(),
+      whitesTurn: true,
+      whiteSwapped: false,
+      blackSwapped: false,
+      playersMove: true,
+      offline: true,
+      firstMove: true,
+      socket: null,
+      disableDrag: false
+    };
+
+    this.onDrop = this.onDrop.bind(this);
+    this.canDrop = this.canDrop.bind(this);
+    this.setSocket = this.setSocket.bind(this);
+    this.makeMove = this.makeMove.bind(this);
+  }
+
+  setSocket(s) {
+    this.setState({ socket: s })
+    this.registerEndpoints()
+  }
+
+  getStartField() {
     var f = [];
     f[0] = [false, ItemTypes.ROOK];
     f[1] = [false, ItemTypes.KNIGHT];
@@ -21,26 +46,25 @@ export default class Field extends React.Component {
     f[9] = [true, ItemTypes.KING];
     f[10] = [true, ItemTypes.KNIGHT];
     f[11] = [true, ItemTypes.ROOK];
-
-    var socket = openSocket(process.env.REACT_APP_API_URL);
-    socket.on('startGame', data => this.startGame(data));
-
-    this.state = {
-      field: f,
-      whitesTurn: true,
-      whiteSwapped: false,
-      blackSwapped: false,
-      playersMove: true,
-      offline: true,
-      firstMove: true
-    };
-
-    this.onDrop = this.onDrop.bind(this);
-    this.canDrop = this.canDrop.bind(this);
+    return f;
   }
 
   startGame(data) {
-    console.log(data)
+    this.setState({
+      field: this.getStartField(),
+      offline: false,
+      playersMove: data["moveFirst"],
+      firstMove: false
+    })
+  }
+
+  makeMove(data) {
+    this.onDrop(data["from"], data["to"])
+  }
+
+  registerEndpoints() {
+    this.state.socket.on('startGame', data => this.startGame(data));
+    this.state.socket.on('move', data => this.makeMove(data));
   }
 
   async onDrop(source, target) {
@@ -67,6 +91,7 @@ export default class Field extends React.Component {
     } else {
       newField[source] = null;
     }
+
     // check if move results in check for other player
     if (this.checkCheck(this.state.field, source, target, !this.state.whitesTurn)) {
       if (this.testCheckMate(newField)) {
@@ -80,7 +105,11 @@ export default class Field extends React.Component {
 
     this.setState({ field: newField, whitesTurn: !this.state.whitesTurn, playersMove: !this.state.playersMove });
 
-    if (this.state.offline && !this.state.playersMove) {
+    if (this.state.playersMove) {
+      return
+    }
+
+    if (this.state.offline) {
       var moves = this.getMoves(this.state.field, this.state.whitesTurn)
       if (moves.length === 0) {
         return
@@ -88,7 +117,12 @@ export default class Field extends React.Component {
       var move = moves[Math.floor(Math.random() * moves.length)]
       await this.sleep(500)
       this.onDrop(move[0], move[1])
-      return
+    } else {
+      var m = {
+        "from": source,
+        "to": target
+      }
+      this.state.socket.emit("makeMove", m)
     }
   }
 
@@ -254,7 +288,14 @@ export default class Field extends React.Component {
         </ Square>
       );
     }
-    return (< div id="field" > {squares} </div>);
+    return (
+      <div id="wrapper">
+        <Top setSocket={this.setSocket} />
+        <div id="center">
+          < div id="field" > {squares} </div>
+        </div>
+      </div>
+    );
   }
 
 

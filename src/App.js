@@ -1,16 +1,13 @@
 import React, { useState } from 'react'
 import Field from './Field';
-import Top from './Top';
 import './App.css';
 
 export default function App() {
   const [infoText, setInfoText] = useState("White's turn");
+  const [socket, setSocket] = useState(null)
   return (
     <div id="App">
-      <Top/>
-      <div id="center">
-        <Field setInfoText={setInfoText}></Field>
-      </div>
+      <Field setInfoText={setInfoText} sock={socket}></Field>
       <div id="lower">
         {infoText}
       </div>
