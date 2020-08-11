@@ -18,7 +18,8 @@ export default class Field extends React.Component {
       offline: true,
       firstMove: true,
       socket: null,
-      disableDrag: false
+      disableDrag: false,
+      partnerID: null
     };
 
     this.onDrop = this.onDrop.bind(this);
@@ -54,7 +55,10 @@ export default class Field extends React.Component {
       field: this.getStartField(),
       offline: false,
       playersMove: data["moveFirst"],
-      firstMove: false
+      firstMove: false,
+      whiteSwapped: false,
+      blackSwapped: false,
+      partnerID: data["partnerID"],
     })
   }
 
@@ -62,9 +66,14 @@ export default class Field extends React.Component {
     this.onDrop(data["from"], data["to"])
   }
 
+  setGameState(data) {
+
+  }
+
   registerEndpoints() {
     this.state.socket.on('startGame', data => this.startGame(data));
     this.state.socket.on('move', data => this.makeMove(data));
+    this.state.socket.on('setGameState', data => this.setGameState(data));
   }
 
   async onDrop(source, target) {
@@ -159,7 +168,7 @@ export default class Field extends React.Component {
   }
 
   canDrop(source, target, color = this.state.whitesTurn, field = this.state.field) {
-    if (!field[source]) {
+    if (!field[source] || (!this.state.offline && !this.state.playersMove)) {
       return false;
     }
     if ((color === field[source][0] && !this.state.firstMove) || source === target) {
@@ -290,13 +299,11 @@ export default class Field extends React.Component {
     }
     return (
       <div id="wrapper">
-        <Top setSocket={this.setSocket} />
+        <Top setSocket={this.setSocket} partnerID={this.state.partnerID} />
         <div id="center">
           < div id="field" > {squares} </div>
         </div>
       </div>
     );
   }
-
-
 }

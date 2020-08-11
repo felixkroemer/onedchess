@@ -7,7 +7,7 @@ export default class Field extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            partnerID: null
+            partnerID: props.partnerID
         }
     }
 
@@ -61,6 +61,12 @@ export default class Field extends React.Component {
         xhr.send(this.state.partnerID);
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.partnerID != prevProps.partnerID) {
+            this.setState({ partnerID: this.props.partnerID });
+        }
+    }
+
     render() {
         return (
             <div id="top">
@@ -69,7 +75,7 @@ export default class Field extends React.Component {
                 {'  '}
                 {'Partner ID: '}
                 <form id="form" onSubmit={this.handleSubmit.bind(this)}>
-                    <input id="inp" type="text" maxlength="5" onChange={this.handleChange.bind(this)}></input>
+                    <input id="inp" type="text" maxlength="5" value={this.state.partnerID} onChange={this.handleChange.bind(this)}></input>
                 </form>
             </div>
         )
