@@ -18,7 +18,6 @@ export default class Field extends React.Component {
       offline: true,
       firstMove: true,
       socket: null,
-      disableDrag: false,
       partnerID: null
     };
 
@@ -52,9 +51,10 @@ export default class Field extends React.Component {
 
   startGame(data) {
     this.setState({
-      field: this.getStartField(),
+      field: data["field"] ? this.parseField(data["field"]) : this.getStartField(),
       offline: false,
-      playersMove: data["moveFirst"],
+      playersMove: data["moveNext"],
+      whitesTurn: "whitesTurn" in data ? data["whitesTurn"] : true,
       firstMove: false,
       whiteSwapped: false,
       blackSwapped: false,
@@ -66,14 +66,34 @@ export default class Field extends React.Component {
     this.onDrop(data["from"], data["to"])
   }
 
-  setGameState(data) {
-
+  parseField(data) {
+    var f = []
+    for (var i = 0; i < 12; i++) {
+      if (data[i]) {
+        var type = null;
+        switch (data[i][1]) {
+          case "ROOK":
+            type = ItemTypes.ROOK
+            break;
+          case "KING":
+            type = ItemTypes.KING
+            break;
+          case "KNIGHT":
+            type = ItemTypes.KNIGHT
+            break;
+          default:
+        }
+        f[i] = [data[i][0], type]
+      } else {
+        f[i] = null
+      }
+    }
+    return f
   }
 
   registerEndpoints() {
     this.state.socket.on('startGame', data => this.startGame(data));
     this.state.socket.on('move', data => this.makeMove(data));
-    this.state.socket.on('setGameState', data => this.setGameState(data));
   }
 
   async onDrop(source, target) {
