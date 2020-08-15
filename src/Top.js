@@ -1,6 +1,6 @@
 import React from 'react';
 import './Top.css';
-import openSocket from 'socket.io-client';
+import io from 'socket.io-client';
 
 export default class Field extends React.Component {
 
@@ -13,7 +13,7 @@ export default class Field extends React.Component {
 
     componentDidMount() {
         var xhr = new XMLHttpRequest();
-        var url = process.env.REACT_APP_API_URL + '/api/getID'
+        var url = process.env.REACT_APP_API_URL + '/onedchess/api/getID'
         xhr.open("GET", url, true);
         xhr.withCredentials = true;
         xhr.onload = function (e) {
@@ -21,7 +21,9 @@ export default class Field extends React.Component {
                 if (xhr.status === 200) {
                     var json_obj = JSON.parse(xhr.responseText);
                     this.setState({ id: json_obj["id"] });
-                    var socket = openSocket(process.env.REACT_APP_API_URL);
+                    var socket = io(process.env.REACT_APP_API_URL, {
+                        path: '/onedchess/api/socketio/'
+                    });
                     this.props.setSocket(socket)
                     socket.emit("registerSID")
                 } else {
@@ -43,7 +45,7 @@ export default class Field extends React.Component {
         e.preventDefault()
         console.log()
         var xhr = new XMLHttpRequest();
-        var url = process.env.REACT_APP_API_URL + '/api/setPartnerID'
+        var url = process.env.REACT_APP_API_URL + '/onedchess/api/setPartnerID'
         xhr.open("POST", url, true);
         xhr.withCredentials = true;
         xhr.onload = function (e) {
