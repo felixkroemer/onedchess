@@ -60,6 +60,7 @@ export default class Field extends React.Component {
       blackSwapped: false,
       partnerID: data["partnerID"],
     })
+    this.updateTextField()
   }
 
   makeMove(data) {
@@ -121,25 +122,16 @@ export default class Field extends React.Component {
       newField[source] = null;
     }
 
-    // check if move results in check for other player
-    if (this.checkCheck(this.state.field, source, target, !this.state.whitesTurn)) {
-      if (this.testCheckMate(newField)) {
-        this.props.setInfoText(this.state.whitesTurn ? "White wins" : "Black wins");
-      } else {
-        this.props.setInfoText(!this.state.whitesTurn ? "White in check" : "Black in check");
-      }
-    } else {
-      this.props.setInfoText(!this.state.whitesTurn ? "White's turn" : "Black's turn");
-    }
-
     this.setState({ field: newField, whitesTurn: !this.state.whitesTurn, playersMove: !this.state.playersMove });
+
+    this.updateTextField()
 
     if (this.state.playersMove) {
       return
     }
 
     if (this.state.offline) {
-      var moves = this.getMoves(this.state.field, this.state.whitesTurn)
+      var moves = this.getMoves()
       if (moves.length === 0) {
         return
       }
@@ -155,14 +147,29 @@ export default class Field extends React.Component {
     }
   }
 
-  getMoves(field, whitesTurn) {
+  updateTextField() {
+    // check if move results in check for other player
+    if (this.checkCheck()) {
+      if (this.testCheckMate()) {
+        this.props.setInfoText(!this.state.whitesTurn ? "White wins" : "Black wins");
+      } else {
+        this.props.setInfoText(this.state.whitesTurn ? "White in check" : "Black in check");
+      }
+    } else {
+      this.props.setInfoText(this.state.whitesTurn ? "White's turn" : "Black's turn");
+    }
+  }
+
+  // get possible moves for currently active player
+  getMoves() {
+    var field = this.state.field;
     var moves = []
     for (var i = 0; i < 12; i++) {
-      if (field[i] && field[i][0] === whitesTurn) {
+      if (field[i] && field[i][0] === this.state.whitesTurn) {
         continue
       } else {
         for (var j = 0; j < 12; j++) {
-          if (this.canDrop(i, j, whitesTurn, field)) {
+          if (this.canDrop(i, j)) {
             moves.push([i, j])
           }
         }
@@ -175,11 +182,12 @@ export default class Field extends React.Component {
     return new Promise(resolve => setTimeout(resolve, msec));
   }
 
-  testCheckMate(newField) {
+  testCheckMate() {
     var checkMate = true;
-    var moves = this.getMoves(newField, !this.state.whitesTurn)
+    var moves = this.getMoves()
     for (var i = 0; i < moves.length; i++) {
-      if (!this.checkCheck(newField, moves[i][0], moves[i][1], !this.state.whitesTurn)) {
+      var newField = this.getFieldAfterMove(this.state.field, moves[i][0], moves[i][1])
+      if (!this.checkCheck(newField, !this.state.whitesTurn)) {
         checkMate = false;
         break;
       }
@@ -187,7 +195,9 @@ export default class Field extends React.Component {
     return checkMate;
   }
 
-  canDrop(source, target, color = this.state.whitesTurn, field = this.state.field) {
+  canDrop(source, target) {
+    var color = this.state.whitesTurn
+    var field = this.state.field
     if (!field[source] || (!this.state.offline && !this.state.playersMove)) {
       return false;
     }
@@ -197,7 +207,7 @@ export default class Field extends React.Component {
       return false;
     } else {
 
-      if (this.checkCheck(field, source, target, color)) {
+      if (this.checkCheck(this.getFieldAfterMove(field, source, target), color)) {
         return false;
       }
       if (field[target] && field[source][0] === field[target][0]) {
@@ -247,10 +257,7 @@ export default class Field extends React.Component {
     }
   }
 
-  /**
-   * check if color is in check after move is carried out
-   */
-  checkCheck(field, source, target, color) {
+  getFieldAfterMove(field, source, target) {
     field = field.slice()
     var s = field[source];
     var t = field[target];
@@ -262,6 +269,13 @@ export default class Field extends React.Component {
     } else {
       field[source] = null;
     }
+    return field
+  }
+
+  /**
+   * check if color is in check after move is carried out
+   */
+  checkCheck(field = this.state.field, color = this.state.whitesTurn) {
     var king = null;
     for (var k = 0; k < 12; k++) {
       if (field[k] && field[k][0] === !color && field[k][1] === ItemTypes.KING) {
