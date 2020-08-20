@@ -79,6 +79,12 @@ export default class Field extends React.Component {
                 <form id="form" onSubmit={this.handleSubmit.bind(this)}>
                     <input id="inp" type="text" maxlength="5" value={this.state.partnerID} onChange={this.handleChange.bind(this)}></input>
                 </form>
+                <div class="outer" onClick={this.props.quitGame} style={{ visibility: this.props.showQuit ? "visible" : "hidden" }}>
+                    <div class="inner">
+                        <label>Quit</label>
+                    </div>
+                </div>
+
             </div>
         )
     }

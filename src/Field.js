@@ -18,13 +18,15 @@ export default class Field extends React.Component {
       offline: true,
       firstMove: true,
       socket: null,
-      partnerID: null
+      partnerID: null,
+      showQuit: false,
     };
 
     this.onDrop = this.onDrop.bind(this);
     this.canDrop = this.canDrop.bind(this);
     this.setSocket = this.setSocket.bind(this);
     this.makeMove = this.makeMove.bind(this);
+    this.quitGame = this.quitGame.bind(this);
   }
 
   setSocket(s) {
@@ -59,8 +61,26 @@ export default class Field extends React.Component {
       whiteSwapped: false,
       blackSwapped: false,
       partnerID: data["partnerID"],
+      showQuit: true,
     })
     this.updateTextField()
+  }
+
+  quitGame(data = null, emit = true) {
+    this.setState({
+      field: this.getStartField(),
+      whitesTurn: true,
+      whiteSwapped: false,
+      blackSwapped: false,
+      playersMove: true,
+      offline: true,
+      firstMove: true,
+      partnerID: "",
+      showQuit: false,
+    });
+    if (emit) {
+      this.state.socket.emit("quitGame")
+    }
   }
 
   makeMove(data) {
@@ -95,6 +115,7 @@ export default class Field extends React.Component {
   registerEndpoints() {
     this.state.socket.on('startGame', data => this.startGame(data));
     this.state.socket.on('move', data => this.makeMove(data));
+    this.state.socket.on('quitGame', data => this.quitGame(data, false));
   }
 
   async onDrop(source, target) {
@@ -333,7 +354,8 @@ export default class Field extends React.Component {
     }
     return (
       <div id="wrapper">
-        <Top setSocket={this.setSocket} partnerID={this.state.partnerID} />
+        <Top setSocket={this.setSocket} partnerID={this.state.partnerID}
+          quitGame={this.quitGame} showQuit={this.state.showQuit} />
         <div id="center">
           < div id="field" > {squares} </div>
         </div>

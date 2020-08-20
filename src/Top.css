@@ -13,7 +13,7 @@
 }
 
 #inp {
-    position:relative;
+    position: relative;
     top: 0;
     left: 0;
     right:0;
@@ -49,4 +49,64 @@
     left: 0;
     right: 0;
     height: 80%;
+  }
+
+  .outer {
+    margin-left: 3%;
+    margin-right: 3%;
+    position: relative;
+    width: 30px;
+    cursor: pointer;
+  }
+
+  .inner {
+    width: inherit;
+    text-align: center;
+  }
+
+  label {
+    font-size: .8em;
+    line-height: 30px;
+    text-transform: uppercase;
+    color: white;
+    transition: all .3s ease-in;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .inner:before, .inner:after {
+    position: absolute;
+    content: '';
+    height: 1px;
+    width: inherit;
+    background: white;
+    left: 0;
+    transition: all .3s ease-in;
+  }
+
+  .inner:before {
+    top: 50%;
+    transform: rotate(45deg);
+  }
+
+  .inner:after {
+    bottom: 50%;
+    transform: rotate(-45deg);
+  }
+
+  .outer:hover label {
+    opacity: 1;
+  }
+
+  .outer:hover .inner:before,
+  .outer:hover .inner:after {
+    transform: rotate(0);
+  }
+
+  .outer:hover .inner:before {
+    top: 0;
+  }
+
+  .outer:hover .inner:after {
+    bottom: 0;
   }
