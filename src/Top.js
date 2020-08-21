@@ -74,7 +74,6 @@ export default class Field extends React.Component {
             <div id="top">
                 {'Your ID: '}
                 <div id="id">{this.state.id ? this.state.id : "     "}</div>
-                {'  '}
                 {'Partner ID: '}
                 <form id="form" onSubmit={this.handleSubmit.bind(this)}>
                     <input id="inp" type="text" maxlength="5" value={this.state.partnerID} onChange={this.handleChange.bind(this)}></input>

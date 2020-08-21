@@ -1,11 +1,9 @@
 #top {
     top: 5%;
-    left: 0;
     right: 7%;
     color: white;
     display: flex;
     align-items: center;
-    justify-content: right;
     font-family: monospace, serif;
     position: absolute;
     z-index: 1;
@@ -13,12 +11,7 @@
 }
 
 #inp {
-    position: relative;
-    top: 0;
-    left: 0;
-    right:0;
-    bottom: 0;
-    width: 100%;
+    width: 60px;
     background-color: black;
     color: white;
     font-family: monospace, serif;
@@ -29,6 +22,7 @@
 }
 
 #id {
+    margin-right: 30px;
     text-align: center;
     width: 6%;
     min-width: 60px;
@@ -38,6 +32,7 @@
 
 
 #form {
+    margin-right: 20px;
     width: 6%;
     min-width: 60px;
     border: none;
@@ -52,8 +47,6 @@
   }
 
   .outer {
-    margin-left: 3%;
-    margin-right: 3%;
     position: relative;
     width: 30px;
     cursor: pointer;
